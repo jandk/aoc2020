@@ -8,12 +8,10 @@ public class Day7 {
         List<String> lines = Util.readResouce("/day7.txt");
 
         List<Edge> edges = lines.stream()
-            .map(Day7::parseBag)
-            .flatMap(bag -> bag.content.entrySet().stream()
-                .map(e -> new Edge(bag.color, e.getKey(), e.getValue())))
+            .flatMap(line -> parseBag(line).stream())
             .collect(Collectors.toUnmodifiableList());
 
-//        part1(edges);
+        part1(edges);
         part2(edges);
     }
 
@@ -48,42 +46,27 @@ public class Day7 {
     }
 
     private static int countBags(Map<String, List<Edge>> adj, Edge edge) {
-        List<Edge> edges = adj.getOrDefault(edge.target, List.of());
-        if (edges.isEmpty()) {
-            return edge.amount;
-        }
-
         int sum = edge.amount;
-        for (Edge e : edges) {
+        for (Edge e : adj.getOrDefault(edge.target, List.of())) {
             sum += countBags(adj, e) * edge.amount;
         }
         return sum;
     }
 
-    private static Bag parseBag(String line) {
+    private static List<Edge> parseBag(String line) {
         int contain = line.indexOf(" bags contain ");
         String color = line.substring(0, contain);
 
-        String contents = line.substring(contain + " bags contain ".length());
-        Map<String, Integer> content = Arrays.stream(contents.split(", "))
+        String[] content = line.substring(contain + " bags contain ".length()).split(", ");
+
+        return Arrays.stream(content)
             .map(s -> s.substring(0, s.lastIndexOf(' ')))
             .filter(s -> !s.equals("no other"))
-            .collect(Collectors.toUnmodifiableMap(
-                s -> s.substring(s.indexOf(' ') + 1),
-                s -> Integer.parseInt(s, 0, s.indexOf(' '), 10)
-            ));
-
-        return new Bag(color, content);
-    }
-
-    private static final class Bag {
-        private final String color;
-        private final Map<String, Integer> content;
-
-        public Bag(String color, Map<String, Integer> content) {
-            this.color = color;
-            this.content = content;
-        }
+            .map(s -> new Edge(
+                color,
+                s.substring(s.indexOf(' ') + 1),
+                Integer.parseInt(s, 0, s.indexOf(' '), 10)))
+            .collect(Collectors.toUnmodifiableList());
     }
 
     private static final class Edge {
