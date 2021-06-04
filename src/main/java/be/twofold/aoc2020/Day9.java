@@ -8,24 +8,17 @@ public class Day9 {
             .mapToLong(Long::parseLong)
             .toArray();
 
-        Queue<Long> queue = new ArrayDeque<>();
-        for (int i = 0; i < 25; i++) {
-            queue.add(numbers[i]);
-        }
-
-        long result = part1(numbers, queue);
+        long result = part1(numbers);
         System.out.println(result);
         System.out.println(part2(numbers, result));
     }
 
-    private static long part1(long[] numbers, Queue<Long> queue) {
+    private static long part1(long[] numbers) {
         for (int i = 25; i < numbers.length; i++) {
             long number = numbers[i];
-            if (!findSum(queue, number)) {
+            if (!findSum(numbers, i, number)) {
                 return number;
             }
-            queue.remove();
-            queue.add(number);
         }
         throw new UnsupportedOperationException();
     }
@@ -51,10 +44,10 @@ public class Day9 {
         throw new UnsupportedOperationException();
     }
 
-    private static boolean findSum(Queue<Long> queue, long number) {
-        for (long n1 : queue) {
-            for (long n2 : queue) {
-                if (n1 + n2 == number) {
+    private static boolean findSum(long[] numbers, int toIndex, long number) {
+        for (int i = toIndex - 25; i < toIndex; i++) {
+            for (int j = toIndex - 25; j < toIndex; j++) {
+                if (numbers[i] + numbers[j] == number) {
                     return true;
                 }
             }
