@@ -36,15 +36,14 @@ public class Day9 {
             for (int j = i; j < numbers.length; j++) {
                 sum += numbers[j];
                 if (sum > number) {
-                    sum = 0;
                     break;
                 } else if (sum == number) {
-                    long min = numbers[i];
-                    long max = numbers[i];
-                    for (int k = i + 1; k < j; k++) {
-                        min = Math.min(min, numbers[k]);
-                        max = Math.max(max, numbers[k]);
-                    }
+                    LongSummaryStatistics statistics = Arrays
+                        .stream(numbers, i, j)
+                        .summaryStatistics();
+
+                    long min = statistics.getMin();
+                    long max = statistics.getMax();
                     return min + max;
                 }
             }
